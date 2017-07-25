@@ -771,6 +771,10 @@ static int _applepay_decrypt_ciphertext(applepay_state_t *state, char **decrypte
     int rc;
 
     ctx = EVP_CIPHER_CTX_new();
+    if(ctx == NULL) {
+        return APPLEPAY_ERROR_COULD_NOT_CREATE_CIPHER_CTX;
+    }
+
     EVP_CIPHER_CTX_init(ctx);
 
     rc = APPLEPAY_OK;
