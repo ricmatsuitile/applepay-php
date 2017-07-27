@@ -775,8 +775,6 @@ static int _applepay_decrypt_ciphertext(applepay_state_t *state, char **decrypte
         return APPLEPAY_ERROR_COULD_NOT_CREATE_CIPHER_CTX;
     }
 
-    EVP_CIPHER_CTX_init(ctx);
-
     rc = APPLEPAY_OK;
     do {
         // Select cipher
@@ -787,6 +785,7 @@ static int _applepay_decrypt_ciphertext(applepay_state_t *state, char **decrypte
 
         // Set IV length, omit for 96 bits
         EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, sizeof(init_vector), NULL);
+        EVP_CIPHER_CTX_free(ctx);
 
         // Specify key and IV
         if (EVP_DecryptInit(ctx, NULL, state->sym_key, init_vector) != 1) {
@@ -825,7 +824,6 @@ static int _applepay_decrypt_ciphertext(applepay_state_t *state, char **decrypte
         (*decrypted)[*decrypted_len] = 0;
     } while (0);
 
-    EVP_CIPHER_CTX_cleanup(ctx);
     EVP_CIPHER_CTX_free(ctx);
 
     return rc;
