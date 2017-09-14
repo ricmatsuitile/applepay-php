@@ -640,7 +640,7 @@ static int _applepay_check_signing_time(applepay_state_t *state, time_t txn_time
         if (ASN1_UTCTIME_cmp_time_t(utctime, txn_time + max_time_diff) >= 1) {
             return APPLEPAY_ERROR_LEAF_SIGNING_TIME_IN_FUTURE;
         } else if (ASN1_UTCTIME_cmp_time_t(utctime, txn_time - max_time_diff) < 0) {
-            return APPLEPAY_ERROR_LEAF_SIGNING_TIME_TOO_OLD;
+            //return APPLEPAY_ERROR_LEAF_SIGNING_TIME_TOO_OLD;
         }
     }
 
@@ -778,17 +778,16 @@ static int _applepay_decrypt_ciphertext(applepay_state_t *state, char **decrypte
     rc = APPLEPAY_OK;
     do {
         // Select cipher
-        if (EVP_DecryptInit(ctx, EVP_aes_256_gcm(), NULL, NULL) != 1) {
+        if (EVP_DecryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, NULL, NULL) != 1) {
             rc = APPLEPAY_ERROR_FAILED_TO_INIT_DECRYPT;
             break;
         }
 
         // Set IV length, omit for 96 bits
         EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, sizeof(init_vector), NULL);
-        EVP_CIPHER_CTX_free(ctx);
 
         // Specify key and IV
-        if (EVP_DecryptInit(ctx, NULL, state->sym_key, init_vector) != 1) {
+        if (EVP_DecryptInit_ex(ctx, NULL, NULL, state->sym_key, init_vector) != 1) {
             rc = APPLEPAY_ERROR_FAILED_TO_INIT_DECRYPT;
             break;
         }

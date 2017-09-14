@@ -25,8 +25,8 @@ if (!extension_loaded('applepay')) {
 
 // Parse cryptogram
 $cryptogram = trim(file_get_contents($opt['c']));
-$cryptogram = str_replace(' ', '', $cryptogram);
-$cryptogram = pack("H*", $cryptogram);
+$bom = pack('H*','EFBBBF');
+$cryptogram = preg_replace("/^$bom/", '', $cryptogram);
 $cryptogram = json_decode($cryptogram, true);
 
 // Set args
